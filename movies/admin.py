@@ -1,6 +1,16 @@
 from django.contrib import admin
 from .models import Actor, RatingStar, Genre, Category, Movie, MovieShots, Rating, Reviews
 from django.utils.html import mark_safe
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django import forms
+
+
+class PostAdminForm(forms.ModelForm):
+    description = forms.CharField(label="Description", widget=CKEditorUploadingWidget())
+
+    class Meta:
+        model = Movie
+        fields = '__all__'
 
 
 @admin.register(Category)
@@ -37,6 +47,8 @@ class MovieAdmin(admin.ModelAdmin):
     save_on_top = True
     save_as = True
     list_editable = ("draft",)
+    actions = ["publish", "unpublish"]
+    form = PostAdminForm
     readonly_fields = ('get_image',)
     fieldsets = (
         (None, {
@@ -62,6 +74,29 @@ class MovieAdmin(admin.ModelAdmin):
 
     def get_image(self, obj):
         return mark_safe(f'<img src={obj.poster.url} width="100" height="110"')
+
+    def unpublish(self, request, queryset):
+        row_update = queryset.update(draft=True)
+        if row_update == 1:
+            message_bit = "1 recorder bin updated"
+        else:
+            message_bit = f"{row_update} recorders bin updated"
+        self.message_user(request, f"{message_bit}")
+
+    def publish(self, request, queryset):
+        row_update = queryset.update(draft=False)
+        if row_update == 1:
+            message_bit = "1 recorder bin updated"
+        else:
+            message_bit = f"{row_update} recorders bin updated"
+        self.message_user(request, f"{message_bit}")
+
+    publish.short_description = "Published"
+    publish.allowe_permissions = ('change', )
+
+    unpublish.short_description = "Unpublished"
+    unpublish.allowe_permissions = ('change', )
+
     get_image.short_description = "Poster"
 
 
