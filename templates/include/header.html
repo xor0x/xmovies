@@ -1,3 +1,4 @@
+{% load movie_tag %}
 <header class="header">
     <div class="container-fluid px-lg-5">
         <!-- nav -->
@@ -20,10 +21,11 @@
                                                 aria-hidden="true"></span></a>
                     <input type="checkbox" id="drop-2">
                     <ul>
-                        <li><a href="moviesingle.html">Movies</a></li>
-                        <li><a href="moviesingle.html">Serials</a></li>
-                        <li><a href="moviesingle.html">Cartoons</a></li>
+                    {% get_categories as categories %}
+                    {% for category in categories %}
+                        <li><a href="/">{{ category.name }}</a> </li>
                     </ul>
+                    {% endfor %}
                 </li>
                 <li><a href="contact.html"
                        style="color: rgb(255, 255, 255); font-weight: 700; text-transform: uppercase;">Login</a>
